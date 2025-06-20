@@ -1,44 +1,35 @@
-const db = require('../utils/db-connection');
+const {Users} = require('../models/allModel'); 
+const {Op} = require('sequelize');
 
-
-const addEntries=(req,res)=>{
-const {id,name,email}=req.body;
-
-const insertQuery = `INSERT INTO Users (id, name,email) VALUES (?, ?, ?)`;
-
-db.execute(insertQuery, [id, name, email], (err, results) => {
-
-    if(err) {
-        console.error('Error inserting data:', err);
-      db.end();
-        return;
-    }
-
-    console.log('Data inserted successfully:');
-    res.status(200).send( `Student with name ${name}   sucessfully added` );
-});
-};
-
-
-
-
-const getAllUsers = (req, res) => {
-
-    const selectQuery = `SELECT * FROM Users`;
-
-    db.execute(selectQuery, (err, results) => {
-        if (err) {
-            console.error('Error fetching data:', err);
-            db.end();
-            return;
-        }
-
-        else {
-            console.log('Data fetched successfully:');
-
-            res.status(200).json(results);
-        }
+const addEntries = async(req, res) => {
+   try {
+    const { id, name, email } = req.body;
+    
+    const userId = await Users.create({
+        id : id,
+        name : name,
+        email: email
     });
+    
+    return res.status(201).json({ message: 'User added successfully', userId });
+    
+   } catch (error) {
+       console.error('Error inserting data:', error);
+       return res.status(500).send('Failed to insert user');    
+    
+   }  }
+
+
+const getAllUsers = async(req, res) => {
+    try {
+    
+        const users = await Users.findAll();
+        res.status(200).json(users);
+    }
+    catch (error) {
+        console.error('Error fetching data:', error);
+        return res.status(500).send('Failed to fetch users');
+    }
 }
 
 
