@@ -25,7 +25,7 @@ const Busses = sequelize.define('Busses', {
     autoIncrement: true
   },
   busNumber: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING, // Ensure this is STRING as discussed
     allowNull: false,
     unique: true
   },
@@ -54,7 +54,7 @@ const Booking = sequelize.define('Booking', {
         key: 'id'
         }
     },
-    busId: {
+    busId: { // This is the column name you want
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
@@ -92,6 +92,12 @@ const Payments = sequelize.define('Payments', {
     }
 });
 
+// Define associations
+Users.hasMany(Booking, { foreignKey: 'userId' });
+Booking.belongsTo(Users, { foreignKey: 'userId', targetKey: 'id' });
+
+Busses.hasMany(Booking, { foreignKey: 'busId' });
+Booking.belongsTo(Busses, { foreignKey: 'busId', targetKey: 'id' });
 
 
 module.exports = {
